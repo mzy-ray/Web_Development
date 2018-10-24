@@ -1,0 +1,90 @@
+@keyframes out {
+  from {
+      opacity: 1;
+  } to {
+      opacity: 0;
+  }
+}
+
+@keyframes leftIn {
+  from {
+      left:-100%;
+  } to {
+      left:0;
+  }
+}
+
+@keyframes rightIn {
+  from {
+      right:-100%;
+
+  } to {
+      right:0;
+  }
+}
+
+
+.animate-switchLeft {
+  position:relative;
+  background:white;
+  overflow: hidden;
+}
+
+.animate-switchRight {
+  position:relative;
+  background:white;
+  overflow: hidden;
+}
+
+.ng-hide-add{ 
+  animation:0 Out; 
+}
+
+.animate-switchLeft.ng-hide-remove{
+  animation: 0.5s leftIn linear;
+}
+
+.animate-switchRight.ng-hide-remove{
+  animation: 0.5s rightIn linear;
+}
+
+
+#input-0:focus{
+	border: solid 1px;
+	border-color: #60b9ff;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.06), 0 0 8px rgba(75, 175, 255, 0.6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.06), 0 0 8px rgba(75, 175, 255, 0.6);
+}
+
+#input-0.ng-invalid.ng-touched{
+    border: solid 1px;
+	border-color: #ff6060;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.06), 0 0 8px rgba(255, 75, 75, 0.6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.06), 0 0 8px rgba(255, 75, 75, 0.6);
+}
+
+
+md-autocomplete md-autocomplete-wrap md-progress-linear{
+	display:none;
+}
+
+md-autocomplete md-autocomplete-wrap button{
+	display:none;
+}
+
+
+a{
+    cursor:pointer;
+}
+
+html {
+    overflow: hidden;
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    overflow: auto;
+}

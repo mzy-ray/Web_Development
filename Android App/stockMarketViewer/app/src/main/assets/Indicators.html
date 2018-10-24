@@ -1,0 +1,209 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+</head>
+
+<body>
+<div id="curChartContainer">
+    <script type="text/javascript">
+        var symbol = chartObj.getSymbol();
+        var name = chartObj.getIndicator();
+        var data = chartObj.getData();
+
+        try{
+            var jsonObj = JSON.parse(data);
+        }catch (e){
+            alert("Failed to parse stock json file");
+        }
+
+        if (jsonObj != null && jsonObj["Meta Data"]){
+            var indicator = jsonObj["Meta Data"]["2: Indicator"];
+            var days = Object.keys(jsonObj["Technical Analysis: "+name]);
+            days = days.slice(0, 130);
+            var xdates = [];
+            var prices = [];
+            var minpriceL = Number.MAX_VALUE;
+
+            if (name == "BBANDS"){
+                var snames = ["Real Middle Band", "Real Lower Band", "Real Upper Band"];
+                var prices1 = [];
+                var prices2 = [];
+                var prices3 = [];
+                for (i = days.length - 1; i >= 0; i--){
+                    xdates.push(days[i].substr(5, 5));
+                    prices1.push(Math.round(parseFloat(jsonObj["Technical Analysis: "+name][days[i]]["Real Middle Band"])*100)/100);
+                    prices2.push(Math.round(parseFloat(jsonObj["Technical Analysis: "+name][days[i]]["Real Lower Band"])*100)/100);
+                    prices3.push(Math.round(parseFloat(jsonObj["Technical Analysis: "+name][days[i]]["Real Upper Band"])*100)/100);
+                    if (prices1[days.length-1-i] < minpriceL){
+                        minpriceL = prices1[days.length-1-i];
+                    }
+                    if (prices2[days.length-1-i] < minpriceL){
+                        minpriceL = prices2[days.length-1-i];
+                    }
+                    if (prices3[days.length-1-i] < minpriceL){
+                        minpriceL = prices3[days.length-1-i];
+                    }
+                }
+                prices.push(prices1);
+                prices.push(prices2);
+                prices.push(prices3);
+            }
+            else if(name == "MACD"){
+                var snames = ["MACD_Signal", "MACD_Hist", "MACD"];
+                var prices1 = [];
+                var prices2 = [];
+                var prices3 = [];
+                for (i = days.length - 1; i >= 0; i--){
+                    xdates.push(days[i].substr(5, 5));
+                    prices1.push(Math.round(parseFloat(jsonObj["Technical Analysis: "+name][days[i]]["MACD_Signal"])*100)/100);
+                    prices2.push(Math.round(parseFloat(jsonObj["Technical Analysis: "+name][days[i]]["MACD_Hist"])*100)/100);
+                    prices3.push(Math.round(parseFloat(jsonObj["Technical Analysis: "+name][days[i]]["MACD"])*100)/100);
+                    if (prices1[days.length-1-i] < minpriceL){
+                        minpriceL = prices1[days.length-1-i];
+                    }
+                    if (prices2[days.length-1-i] < minpriceL){
+                        minpriceL = prices2[days.length-1-i];
+                    }
+                    if (prices3[days.length-1-i] < minpriceL){
+                        minpriceL = prices3[days.length-1-i];
+                    }
+                }
+                prices.push(prices1);
+                prices.push(prices2);
+                prices.push(prices3);
+            }
+            else if (name == "STOCH"){
+                minpriceL = 0;
+                var snames = ["SlowD", "SlowK"];
+                var prices1 = [];
+                var prices2 = [];
+                for (i = days.length - 1; i >= 0; i--){
+                    xdates.push(days[i].substr(5, 5));
+                    prices1.push(Math.round(parseFloat(jsonObj["Technical Analysis: "+name][days[i]]["SlowD"])*100)/100);
+                    prices2.push(Math.round(parseFloat(jsonObj["Technical Analysis: "+name][days[i]]["SlowK"])*100)/100);
+                }
+                prices.push(prices1);
+                prices.push(prices2);
+            }
+            else{
+                var prices1 = [];
+                for (i = days.length - 1; i >= 0; i--){
+                    xdates.push(days[i].substr(5, 5));
+                    prices1.push(Math.round(parseFloat(jsonObj["Technical Analysis: "+name][days[i]][name])*100)/100);
+                    if (prices1[days.length-1-i] < minpriceL){
+                        minpriceL = prices1[days.length-1-i];
+                    }
+                }
+                prices.push(prices1);
+            }
+
+            if (name == "BBANDS" || name == "MACD"){
+                var chartData = {
+                    "chart": {
+                        "borderWidth": 2,
+                        "borderColor": '#cecece',
+                        "zoomType": 'x'
+                    },
+                    "title": {
+                        "text": indicator
+                    },
+                    "subtitle": {
+                        "useHTML": true,
+                        "text": '<a style="color:blue" href="https://www.alphavantage.co/" target="_blank">' + 'Source: Alpha Vantage</a>'
+                    },
+                    "xAxis": {
+                        "categories": xdates,
+                        "tickInterval": 1
+                    },
+                    "yAxis": {
+                        "min": minpriceL,
+                        "title": {
+                            "text": name
+                        }
+                    },
+                    "series": [{
+                        "name": symbol + ' ' + snames[0],
+                        "data": prices[0]
+                    },{
+                        "name": symbol + ' ' + snames[1],
+                        "data": prices[1]
+                    },{
+                        "name": symbol + ' ' + snames[2],
+                        "data": prices[2]
+                    }]
+                };
+                Highcharts.chart('curChartContainer', chartData);
+            }
+            else if(name == "STOCH"){
+                var chartData = {
+                    "chart": {
+                        "borderWidth": 2,
+                        "borderColor": '#cecece',
+                        "zoomType": 'x'
+                    },
+                    "title": {
+                        "text": indicator
+                    },
+                    "subtitle": {
+                        "useHTML": true,
+                        "text": '<a style="color:blue" href="https://www.alphavantage.co/" target="_blank">' + 'Source: Alpha Vantage</a>'
+                    },
+                    "xAxis": {
+                        "categories": xdates,
+                        "tickInterval": 1
+                    },
+                    "yAxis": {
+                        "min": minpriceL,
+                        "title": {
+                            "text": name
+                        }
+                    },
+                    "series": [{
+                        "name": symbol + ' ' + snames[0],
+                        "data": prices[0]
+                    },{
+                        "name": symbol + ' ' + snames[1],
+                        "data": prices[1]
+                    }]
+                };
+                Highcharts.chart('curChartContainer', chartData);
+            }
+            else{
+                var chartData = {
+                    "chart": {
+                        "borderWidth": 2,
+                        "borderColor": '#cecece',
+                        "zoomType": 'x'
+                    },
+                    "title": {
+                        "text": indicator
+                    },
+                    "subtitle": {
+                        "useHTML": true,
+                        "text": '<a style="color:blue" href="https://www.alphavantage.co/" target="_blank">' + 'Source: Alpha Vantage</a>'
+                    },
+                    "xAxis": {
+                        "categories": xdates,
+                        "tickInterval": 1
+                    },
+                    "yAxis": {
+                        "min": minpriceL,
+                        "title": {
+                            "text": name
+                        }
+                    },
+                    "series": [{
+                        "name": symbol,
+                        "data": prices[0]
+                    }]
+                };
+                Highcharts.chart('curChartContainer', chartData);
+            }
+        }
+    </script>
+</div>
+</body>
+</html>
